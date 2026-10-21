@@ -1,5 +1,5 @@
 -- =====================================================
--- BASE DE DATOS: RESTAURANTE EL BUEN SABOR (v7 FINAL - OPTIMIZADO)
+-- BASE DE DATOS: RESTAURANTE EL BUEN SABOR (v8 - SIN DUPLICADOS)
 -- =====================================================
 DROP DATABASE IF EXISTS restaurante_db;
 CREATE DATABASE IF NOT EXISTS restaurante_db;
@@ -142,32 +142,33 @@ CREATE TABLE pedido_detalle (
 );
 
 -- =====================================================
--- DATOS DE PRUEBA LIMPIOS
+-- DATOS DE PRUEBA LIMPIOS (SIN DUPLICADOS)
 -- =====================================================
 
 -- 1. Configuración
-INSERT INTO configuracion (precio_menu, costo_descartable, costo_delivery) VALUES (10.00, 2.00, 2.00);
+INSERT INTO configuracion (precio_menu, costo_descartable, costo_delivery) 
+VALUES (10.00, 2.00, 2.00);
 
--- 2. Platos del MENÚ (Entradas, Segundos y Bebidas)
+-- 2. Platos del MENÚ
 INSERT INTO catalogo_plato_menu (nombre, tipo_menu, permite_cambio_presa) VALUES
-('Sopa de pollo', 'ENTRADA', FALSE),
-('Sopa de res', 'ENTRADA', FALSE),
-('Ocopa arequipeña', 'ENTRADA', FALSE),
-('Ensalada rusa', 'ENTRADA', FALSE),
-('Frejoles', 'SEGUNDO', TRUE),
-('Tacu tacu', 'SEGUNDO', TRUE),
-('Lomo saltado', 'SEGUNDO', FALSE),
-('Arroz con pollo', 'SEGUNDO', TRUE),
-('Chicha morada', 'BEBIDA', FALSE),
-('Limonada', 'BEBIDA', FALSE),
-('Carambola', 'BEBIDA', FALSE);
+('Sopa de pollo',      'ENTRADA', FALSE),  -- 1
+('Sopa de res',        'ENTRADA', FALSE),  -- 2
+('Ocopa arequipeña',   'ENTRADA', FALSE),  -- 3
+('Ensalada rusa',      'ENTRADA', FALSE),  -- 4
+('Frejoles',           'SEGUNDO', TRUE),   -- 5
+('Tacu tacu',          'SEGUNDO', TRUE),   -- 6
+('Lomo saltado',       'SEGUNDO', FALSE),  -- 7
+('Arroz con pollo',    'SEGUNDO', TRUE),   -- 8
+('Chicha morada',      'BEBIDA',  FALSE),  -- 9
+('Limonada',           'BEBIDA',  FALSE),  -- 10
+('Carambola',          'BEBIDA',  FALSE);  -- 11
 
--- 3. Presas
+-- 3. Presas (solo 4)
 INSERT INTO presa (nombre, precio_adicional) VALUES
-('Seco de pollo', 0.00),
-('Pollo frito', 3.00),
-('Pescado', 5.00),
-('Bistec', 4.00);
+('Seco de pollo', 0.00),   -- 1
+('Pollo frito',   3.00),   -- 2
+('Pescado',       5.00),   -- 3
+('Bistec',        4.00);   -- 4
 
 -- 4. Asociaciones plato-presa
 INSERT INTO plato_menu_presa (catalogo_plato_menu_id, presa_id, presa_por_defecto) VALUES
@@ -175,85 +176,66 @@ INSERT INTO plato_menu_presa (catalogo_plato_menu_id, presa_id, presa_por_defect
 (6, 1, TRUE), (6, 2, FALSE), (6, 3, FALSE),
 (8, 1, TRUE), (8, 2, FALSE), (8, 3, FALSE), (8, 4, FALSE);
 
--- 5. Platos a la CARTA (SOLO PLATOS PRINCIPALES - PLATO_FONDO)
--- ✅ ELIMINADO: Gaseosa (es bebida, ya está en menú)
--- ✅ ELIMINADO: Arroz con leche (es postre, no es plato principal)
+-- 5. Platos a la CARTA
 INSERT INTO catalogo_plato_carta (nombre, categoria, precio, stock) VALUES
 ('Lomo saltado a la carta', 'PLATO_FONDO', 22.00, 30),
-('Pollo a la brasa', 'PLATO_FONDO', 25.00, 25),
-('Pescado frito', 'PLATO_FONDO', 28.00, 20),
-('Chicharrón de pollo', 'PLATO_FONDO', 20.00, 25),
-('Tallarín saltado', 'PLATO_FONDO', 18.00, 30);
+('Pollo a la brasa',        'PLATO_FONDO', 25.00, 25),
+('Pescado frito',           'PLATO_FONDO', 28.00, 20),
+('Chicharrón de pollo',     'PLATO_FONDO', 20.00, 25),
+('Tallarín saltado',        'PLATO_FONDO', 18.00, 30);
 
 -- 6. Cliente de ejemplo
 INSERT INTO cliente (telefono, nombre, notas) VALUES
 ('999888777', 'Sra. María', 'Siempre pide sin ají, le gusta el pescado');
 
--- 7. Stock de platos del menú para hoy
-INSERT INTO plato_menu_dia (catalogo_plato_menu_id, fecha, stock) VALUES
-(1, CURDATE(), 20), (2, CURDATE(), 15), (3, CURDATE(), 10), (4, CURDATE(), 12),
-(5, CURDATE(), 30), (6, CURDATE(), 25), (7, CURDATE(), 20), (8, CURDATE(), 18),
-(9, CURDATE(), 40), (10, CURDATE(), 35), (11, CURDATE(), 30);
+-- 7. Stock de platos del menú para hoy (UNA SOLA VEZ, todos los platos)
+INSERT INTO plato_menu_dia (catalogo_plato_menu_id, fecha, stock, disponible) VALUES
+(1,  CURDATE(), 20, TRUE),   -- Sopa de pollo
+(2,  CURDATE(), 15, TRUE),   -- Sopa de res
+(3,  CURDATE(), 10, TRUE),   -- Ocopa arequipeña
+(4,  CURDATE(), 12, TRUE),   -- Ensalada rusa
+(5,  CURDATE(), 30, TRUE),   -- Frejoles
+(6,  CURDATE(), 25, TRUE),   -- Tacu tacu
+(7,  CURDATE(), 20, TRUE),   -- Lomo saltado
+(8,  CURDATE(), 18, TRUE),   -- Arroz con pollo
+(9,  CURDATE(), 40, TRUE),   -- Chicha morada
+(10, CURDATE(), 35, TRUE),   -- Limonada
+(11, CURDATE(), 30, TRUE);   -- Carambola
 
--- 8. Stock de presas para hoy
+-- 8. Stock de presas para hoy (UNA SOLA VEZ, solo las 4 presas existentes)
 INSERT INTO presa_dia (presa_id, fecha, stock) VALUES
-(1, CURDATE(), 30), (2, CURDATE(), 20), (3, CURDATE(), 15), (4, CURDATE(), 10);
+(1, CURDATE(), 30),  -- Seco de pollo
+(2, CURDATE(), 20),  -- Pollo frito
+(3, CURDATE(), 15),  -- Pescado
+(4, CURDATE(), 10);  -- Bistec
 
 -- =====================================================
--- VERIFICACIONES
+-- VERIFICACIONES (limpias, sin repetir)
 -- =====================================================
 SELECT '✅ CONFIGURACIÓN' AS info;
 SELECT * FROM configuracion;
 
 SELECT '✅ PLATOS DEL MENÚ' AS info;
-SELECT id, nombre, tipo_menu, permite_cambio_presa FROM catalogo_plato_menu ORDER BY tipo_menu, nombre;
+SELECT id, nombre, tipo_menu, permite_cambio_presa 
+FROM catalogo_plato_menu 
+ORDER BY tipo_menu, nombre;
 
-SELECT '✅ PLATOS A LA CARTA (Solo platos principales)' AS info;
-SELECT id, nombre, categoria, precio, stock FROM catalogo_plato_carta WHERE activo = TRUE ORDER BY categoria, nombre;
+SELECT '✅ PLATOS A LA CARTA' AS info;
+SELECT id, nombre, categoria, precio, stock 
+FROM catalogo_plato_carta 
+WHERE activo = TRUE 
+ORDER BY categoria, nombre;
 
-SELECT '✅ BEBIDAS (Disponibles en ambos modos)' AS info;
-SELECT id, nombre FROM catalogo_plato_menu WHERE tipo_menu = 'BEBIDA' AND activo = TRUE;
-
-SELECT '✅ STOCK DE HOY' AS info;
-SELECT cp.nombre, cp.tipo_menu, pmd.stock 
+SELECT '✅ STOCK DE HOY (menú)' AS info;
+SELECT cp.id, cp.nombre, cp.tipo_menu, pmd.stock, pmd.disponible
 FROM plato_menu_dia pmd
 JOIN catalogo_plato_menu cp ON pmd.catalogo_plato_menu_id = cp.id
 WHERE pmd.fecha = CURDATE()
 ORDER BY cp.tipo_menu, cp.nombre;
 
-select * from catalogo_plato_menu;
-   SELECT id, nombre, tipo_menu FROM catalogo_plato_menu;
-   
-      SELECT * FROM configuracion;
-      
-      SELECT pmd.id, cpm.nombre, cpm.tipo_menu, pmd.stock, pmd.fecha 
-FROM plato_menu_dia pmd
-JOIN catalogo_plato_menu cpm ON pmd.catalogo_plato_menu_id = cpm.id
-WHERE pmd.fecha = CURDATE();
-
--- Asignar entradas al menú de hoy
-INSERT INTO plato_menu_dia (catalogo_plato_menu_id, fecha, stock, disponible) VALUES
-(1, CURDATE(), 20, TRUE),   -- Sopa de pollo (ENTRADA)
-(2, CURDATE(), 20, TRUE),   -- Sopa de res (ENTRADA)
-(3, CURDATE(), 20, TRUE),   -- Ocopa arequipeña (ENTRADA)
-(4, CURDATE(), 20, TRUE);   -- Ensalada rusa (ENTRADA)
-
--- Asignar segundos al menú de hoy
-INSERT INTO plato_menu_dia (catalogo_plato_menu_id, fecha, stock, disponible) VALUES
-(5, CURDATE(), 30, TRUE),   -- Frejoles (SEGUNDO)
-(6, CURDATE(), 30, TRUE),   -- Tacu tacu (SEGUNDO)
-(7, CURDATE(), 30, TRUE),   -- Lomo saltado (SEGUNDO)
-(8, CURDATE(), 30, TRUE);   -- Arroz con pollo (SEGUNDO)
-
--- Asignar bebidas al menú de hoy
-INSERT INTO plato_menu_dia (catalogo_plato_menu_id, fecha, stock, disponible) VALUES
-(9, CURDATE(), 40, TRUE),   -- Chicha morada (BEBIDA)
-(10, CURDATE(), 40, TRUE),  -- Limonada (BEBIDA)
-(11, CURDATE(), 40, TRUE);  -- Carambola (BEBIDA)
-
-INSERT INTO presa_dia (presa_id, fecha, stock) VALUES
-(3, CURDATE(), 30),  -- Pescado a la plancha
-(4, CURDATE(), 30),  -- Bistec
-(5, CURDATE(), 30),  -- Pollo a la brasa
-(6, CURDATE(), 30),  -- Pescado frito
-(7, CURDATE(), 30);  -- Platano frito
+SELECT '✅ STOCK DE HOY (presas)' AS info;
+SELECT p.id, p.nombre, pd.stock
+FROM presa_dia pd
+JOIN presa p ON pd.presa_id = p.id
+WHERE pd.fecha = CURDATE()
+ORDER BY p.id;
