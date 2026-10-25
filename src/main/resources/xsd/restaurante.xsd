@@ -1,0 +1,42 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://elbuensabor.com/schema"
+           targetNamespace="http://elbuensabor.com/schema"
+           elementFormDefault="qualified">
+
+    <!-- 1. Operación: Consultar Menú del Día -->
+    <xs:element name="ConsultarMenuDelDiaRequest">
+        <xs:complexType/>
+    </xs:element>
+
+    <xs:element name="ConsultarMenuDelDiaResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fecha" type="xs:string"/>
+                <xs:element name="totalPlatos" type="xs:int"/>
+                <xs:element name="mensaje" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- 2. Operación: Consultar Pedido por ID -->
+    <xs:element name="ConsultarPedidoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="pedidoId" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ConsultarPedidoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="pedidoId" type="xs:long"/>
+                <xs:element name="cliente" type="xs:string"/>
+                <xs:element name="total" type="xs:double"/>
+                <xs:element name="estado" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
