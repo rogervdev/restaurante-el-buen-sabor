@@ -32,7 +32,8 @@ public class PresaService {
     public PresaResponseDTO crear(PresaRequestDTO request) {
         Presa presa = new Presa();
         presa.setNombre(request.getNombre());
-        presa.setPrecioAdicional(request.getPrecioAdicional());
+        // Validamos que si viene null, guarde 0 por defecto
+        presa.setPrecioAdicional(request.getPrecioAdicional() != null ? request.getPrecioAdicional() : 0.0); // O BigDecimal.ZERO si es BigDecimal
         presa.setActivo(true);
         Presa presaGuardada = presaRepository.save(presa);
         return convertirAResponseDTO(presaGuardada);
@@ -42,7 +43,10 @@ public class PresaService {
         Presa presa = presaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Presa no encontrada con ID: " + id));
         presa.setNombre(request.getNombre());
-        presa.setPrecioAdicional(request.getPrecioAdicional());
+
+        // Blindaje clave: Si el request trae null en el precio, le asignamos 0 para evitar que se guarde NULL en la BD
+        presa.setPrecioAdicional(request.getPrecioAdicional() != null ? request.getPrecioAdicional() : 0.0); // O BigDecimal.ZERO
+
         Presa presaActualizada = presaRepository.save(presa);
         return convertirAResponseDTO(presaActualizada);
     }
