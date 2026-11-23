@@ -18,13 +18,8 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> crearPedido(@Valid @RequestBody PedidoRequestDTO request) {
-        try {
-            PedidoResponseDTO respuesta = pedidoService.crearPedido(request);
-            return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            // Si falla el stock o algo, devolvemos un 400 Bad Request con el mensaje
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        // El manejo de errores (stock, validaciones, recursos) queda delegado a GlobalExceptionHandler.
+        return new ResponseEntity<>(pedidoService.crearPedido(request), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/estado")

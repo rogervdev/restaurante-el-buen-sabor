@@ -56,7 +56,6 @@ CREATE TABLE plato_menu_presa (
 CREATE TABLE catalogo_plato_carta (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    categoria VARCHAR(50) NOT NULL, -- PLATO_FONDO, ENTRADA_CARTA, POSTRE
     precio DECIMAL(10,2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     activo BOOLEAN DEFAULT TRUE
@@ -177,12 +176,12 @@ INSERT INTO plato_menu_presa (catalogo_plato_menu_id, presa_id, presa_por_defect
 (8, 1, TRUE), (8, 2, FALSE), (8, 3, FALSE), (8, 4, FALSE);
 
 -- 5. Platos a la CARTA
-INSERT INTO catalogo_plato_carta (nombre, categoria, precio, stock) VALUES
-('Lomo saltado a la carta', 'PLATO_FONDO', 22.00, 30),
-('Pollo a la brasa',        'PLATO_FONDO', 25.00, 25),
-('Pescado frito',           'PLATO_FONDO', 28.00, 20),
-('Chicharrón de pollo',     'PLATO_FONDO', 20.00, 25),
-('Tallarín saltado',        'PLATO_FONDO', 18.00, 30);
+INSERT INTO catalogo_plato_carta (nombre, precio, stock) VALUES
+('Lomo saltado a la carta', 22.00, 30),
+('Pollo a la brasa',        25.00, 25),
+('Pescado frito',           28.00, 20),
+('Chicharrón de pollo',     20.00, 25),
+('Tallarín saltado',        18.00, 30);
 
 -- 6. Cliente de ejemplo
 INSERT INTO cliente (telefono, nombre, notas) VALUES
@@ -221,10 +220,10 @@ FROM catalogo_plato_menu
 ORDER BY tipo_menu, nombre;
 
 SELECT '✅ PLATOS A LA CARTA' AS info;
-SELECT id, nombre, categoria, precio, stock 
+SELECT id, nombre, precio, stock 
 FROM catalogo_plato_carta 
 WHERE activo = TRUE 
-ORDER BY categoria, nombre;
+ORDER BY nombre;
 
 SELECT '✅ STOCK DE HOY (menú)' AS info;
 SELECT cp.id, cp.nombre, cp.tipo_menu, pmd.stock, pmd.disponible

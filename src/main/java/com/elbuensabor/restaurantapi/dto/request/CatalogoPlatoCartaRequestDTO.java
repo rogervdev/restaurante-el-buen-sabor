@@ -17,9 +17,6 @@ public class CatalogoPlatoCartaRequestDTO {
     @NotBlank(message = "El nombre del plato es obligatorio")
     private String nombre;
 
-    @NotBlank(message = "La categoría es obligatoria")
-    private String categoria; // SOPA, ENTRADA, PLATO_FONDO, BEBIDA, POSTRE
-
     @NotNull(message = "El precio es obligatorio")
     @Min(value = 0, message = "El precio debe ser mayor o igual a 0")
     private Double precio;
@@ -27,4 +24,10 @@ public class CatalogoPlatoCartaRequestDTO {
     @NotNull(message = "El stock es obligatorio")
     @Min(value = 0, message = "El stock debe ser mayor o igual a 0")
     private Integer stock;
+
+    /**
+     * Opcional. Permite activar/desactivar el plato desde el panel de
+     * administración. Si no se envía, se conserva el valor actual (o true al crear).
+     */
+    private Boolean activo;
 }

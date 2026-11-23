@@ -5,46 +5,55 @@ import com.elbuensabor.restaurantapi.dto.response.PresaResponseDTO;
 import com.elbuensabor.restaurantapi.model.CatalogoPlatoMenu;
 import com.elbuensabor.restaurantapi.model.PlatoMenuDia;
 import com.elbuensabor.restaurantapi.model.PlatoMenuPresa;
-import com.elbuensabor.restaurantapi.model.PresaDia;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class MenuMapper {
+
+    private final PresaMapper presaMapper;
 
     public PlatoMenuResponseDTO toDTO(
             PlatoMenuDia platoDia,
             List<PlatoMenuPresa> presasDelPlato,
             Map<Long, Integer> stockPresas) {
 
+        if (platoDia == null) {
+            return null;
+        }
+
         CatalogoPlatoMenu catalogo = platoDia.getCatalogoPlatoMenu();
 
-        // ✅ CORRECCIÓN: Eliminamos el .filter() para que el frontend reciba TODAS las presas
-        // y pueda mostrar las que tienen stock 0 como "Agotado".
-        List<PresaResponseDTO> presasDTO = presasDelPlato.stream()
-                .map(pp -> {
-                    Integer stock = stockPresas.getOrDefault(pp.getPresa().getId(), 0);
-                    return PresaResponseDTO.builder()
-                            .id(pp.getPresa().getId())
-                            .nombre(pp.getPresa().getNombre())
-                            .precioAdicional(pp.getPresa().getPrecioAdicional())
-                            .stock(stock)
-                            .porDefecto(pp.getPresaPorDefecto())
-                            .build();
-                })
-                .collect(Collectors.toList());
+        List<PresaResponseDTO> presasDTO = presasDelPlato == null
+                ? List.of()
+                : presasDelPlato.stream()
+                        .filter(Objects::nonNull)
+                        .map(pp -> {
+                            Integer stock = pp.getPresa() != null && stockPresas != null
+                                    ? stockPresas.getOrDefault(pp.getPresa().getId(), 0)
+                                    : 0;
+                            return presaMapper.toResponseDTO(pp.getPresa(), stock, pp.getPresaPorDefecto());
+                        })
+                        .collect(Collectors.toList());
 
         return PlatoMenuResponseDTO.builder()
-                .id(catalogo.getId())
-                .nombre(catalogo.getNombre())
-                .tipoMenu(catalogo.getTipoMenu().name())
+                .id(catalogo != null ? catalogo.getId() : null)
+                .nombre(catalogo != null ? catalogo.getNombre() : null)
+                .tipoMenu(catalogo != null && catalogo.getTipoMenu() != null ? catalogo.getTipoMenu().name() : null)
                 .stock(platoDia.getStock())
-                .disponible(platoDia.getDisponible() && platoDia.getStock() > 0)
-                .permiteCambioPresa(catalogo.getPermiteCambioPresa())
-                .presasDisponibles(catalogo.getPermiteCambioPresa() ? presasDTO : null)
+                .disponible(Boolean.TRUE.equals(platoDia.getDisponible())
+                        && platoDia.getStock() != null
+                        && platoDia.getStock() > 0)
+                .permiteCambioPresa(catalogo != null ? catalogo.getPermiteCambioPresa() : null)
+                .presasDisponibles(catalogo != null && Boolean.TRUE.equals(catalogo.getPermiteCambioPresa())
+                        ? presasDTO
+                        : null)
                 .build();
     }
 }

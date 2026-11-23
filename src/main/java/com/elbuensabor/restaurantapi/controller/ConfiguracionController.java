@@ -1,11 +1,15 @@
 package com.elbuensabor.restaurantapi.controller;
 
 
-import com.elbuensabor.restaurantapi.model.Configuracion;
-import com.elbuensabor.restaurantapi.repository.ConfiguracionRepository;
+import com.elbuensabor.restaurantapi.dto.request.ConfiguracionRequestDTO;
+import com.elbuensabor.restaurantapi.dto.response.ConfiguracionResponseDTO;
+import com.elbuensabor.restaurantapi.service.ConfiguracionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,16 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ConfiguracionController {
 
-    private final ConfiguracionRepository configuracionRepository;
+    private final ConfiguracionService configuracionService;
 
     // ✅ Esta es la ruta exacta que pide tu frontend
     @GetMapping("/configuracion")
-    public ResponseEntity<Configuracion> obtenerConfiguracion() {
-        // Busca la primera (y única) fila de la tabla configuración
-        Configuracion config = configuracionRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No hay configuración en la base de datos. Ejecuta el INSERT en MySQL."));
+    public ResponseEntity<ConfiguracionResponseDTO> obtenerConfiguracion() {
+        return ResponseEntity.ok(configuracionService.obtenerConfiguracion());
+    }
 
-        return ResponseEntity.ok(config);
+    @PutMapping("/configuracion")
+    public ResponseEntity<ConfiguracionResponseDTO> actualizarConfiguracion(
+            @Valid @RequestBody ConfiguracionRequestDTO request) {
+        return ResponseEntity.ok(configuracionService.actualizar(request));
     }
 }

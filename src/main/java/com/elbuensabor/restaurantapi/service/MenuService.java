@@ -2,6 +2,7 @@ package com.elbuensabor.restaurantapi.service;
 
 import com.elbuensabor.restaurantapi.dto.response.MenuDiaResponseDTO;
 import com.elbuensabor.restaurantapi.dto.response.PlatoMenuResponseDTO;
+import com.elbuensabor.restaurantapi.exception.ResourceNotFoundException;
 import com.elbuensabor.restaurantapi.mapper.MenuMapper;
 import com.elbuensabor.restaurantapi.model.Configuracion;
 import com.elbuensabor.restaurantapi.model.PlatoMenuDia;
@@ -31,7 +32,7 @@ public class MenuService {
         // 1. Obtener precio del menú
         Configuracion config = configuracionRepository.findAll().stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No hay configuración de precio del menú"));
+                .orElseThrow(() -> new ResourceNotFoundException("No hay configuración de precio del menú"));
 
         // 🚀 2. OPTIMIZACIÓN: 1 sola consulta SQL con JOIN FETCH (trae platos + presas de una vez)
         List<PlatoMenuDia> platosDelDia = platoMenuDiaRepository.buscarConRelaciones(hoy);

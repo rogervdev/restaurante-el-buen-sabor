@@ -6,7 +6,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "catalogo_plato_menu")
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CatalogoPlatoMenu {
@@ -23,9 +25,11 @@ public class CatalogoPlatoMenu {
     @Column(name = "tipo_menu", nullable = false, length = 50)
     private TipoMenu tipoMenu;
 
+    @Builder.Default
     @Column(name = "permite_cambio_presa")
     private Boolean permiteCambioPresa = false;
 
+    @Builder.Default
     private Boolean activo = true;
 
     @OneToMany(mappedBy = "catalogoPlatoMenu")

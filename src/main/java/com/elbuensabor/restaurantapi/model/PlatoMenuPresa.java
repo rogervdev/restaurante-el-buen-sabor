@@ -7,7 +7,9 @@ import lombok.*;
 @Table(name = "plato_menu_presa", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"catalogo_plato_menu_id", "presa_id"})
 })
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlatoMenuPresa {
@@ -24,6 +26,7 @@ public class PlatoMenuPresa {
     @JoinColumn(name = "presa_id", nullable = false)
     private Presa presa;
 
+    @Builder.Default
     @Column(name = "presa_por_defecto")
     private Boolean presaPorDefecto = false;
 }

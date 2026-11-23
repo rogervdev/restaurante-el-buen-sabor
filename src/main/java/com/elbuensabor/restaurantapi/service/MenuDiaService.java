@@ -4,7 +4,9 @@ import com.elbuensabor.restaurantapi.dto.request.ConfigurarMenuDiaRequestDTO;
 import com.elbuensabor.restaurantapi.dto.response.MenuDiaConfiguradoResponseDTO;
 import com.elbuensabor.restaurantapi.dto.response.PlatoMenuResponseDTO;
 import com.elbuensabor.restaurantapi.dto.response.PresaResponseDTO;
+import com.elbuensabor.restaurantapi.exception.ResourceNotFoundException;
 import com.elbuensabor.restaurantapi.mapper.MenuMapper;
+import com.elbuensabor.restaurantapi.mapper.PresaMapper;
 import com.elbuensabor.restaurantapi.model.*;
 import com.elbuensabor.restaurantapi.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class MenuDiaService {
     private final PresaRepository presaRepository;
     private final PlatoMenuPresaRepository platoMenuPresaRepository;
     private final MenuMapper menuMapper;
+    private final PresaMapper presaMapper;
 
     @Transactional
     public MenuDiaConfiguradoResponseDTO configurarMenuDia(ConfigurarMenuDiaRequestDTO request) {
@@ -40,13 +43,14 @@ public class MenuDiaService {
         List<PlatoMenuResponseDTO> platosDTO = new ArrayList<>();
         for (ConfigurarMenuDiaRequestDTO.PlatoDiaItemDTO item : request.getPlatos()) {
             CatalogoPlatoMenu plato = catalogoPlatoMenuRepository.findById(item.getCatalogoPlatoMenuId())
-                    .orElseThrow(() -> new RuntimeException("Plato no encontrado con ID: " + item.getCatalogoPlatoMenuId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Plato no encontrado con ID: " + item.getCatalogoPlatoMenuId()));
 
-            PlatoMenuDia platoDia = new PlatoMenuDia();
-            platoDia.setCatalogoPlatoMenu(plato);
-            platoDia.setFecha(hoy);
-            platoDia.setStock(item.getStock());
-            platoDia.setDisponible(item.getStock() > 0);
+            PlatoMenuDia platoDia = PlatoMenuDia.builder()
+                    .catalogoPlatoMenu(plato)
+                    .fecha(hoy)
+                    .stock(item.getStock())
+                    .disponible(item.getStock() != null && item.getStock() > 0)
+                    .build();
             platoMenuDiaRepository.save(platoDia);
 
             // Obtener presas asociadas a este plato
@@ -66,20 +70,16 @@ public class MenuDiaService {
         List<PresaResponseDTO> presasDTO = new ArrayList<>();
         for (ConfigurarMenuDiaRequestDTO.PresaDiaItemDTO item : request.getPresas()) {
             Presa presa = presaRepository.findById(item.getPresaId())
-                    .orElseThrow(() -> new RuntimeException("Presa no encontrada con ID: " + item.getPresaId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Presa no encontrada con ID: " + item.getPresaId()));
 
-            PresaDia presaDia = new PresaDia();
-            presaDia.setPresa(presa);
-            presaDia.setFecha(hoy);
-            presaDia.setStock(item.getStock());
+            PresaDia presaDia = PresaDia.builder()
+                    .presa(presa)
+                    .fecha(hoy)
+                    .stock(item.getStock())
+                    .build();
             presaDiaRepository.save(presaDia);
 
-            presasDTO.add(PresaResponseDTO.builder()
-                    .id(presa.getId())
-                    .nombre(presa.getNombre())
-                    .precioAdicional(presa.getPrecioAdicional())
-                    .stock(item.getStock())
-                    .build());
+            presasDTO.add(presaMapper.toResponseDTO(presa, item.getStock()));
         }
 
         // 4. Retornar respuesta
@@ -95,7 +95,7 @@ public class MenuDiaService {
     public MenuDiaConfiguradoResponseDTO obtenerMenuDiaConfigurado() {
         LocalDate hoy = LocalDate.now();
 
-        // 🚀 OPTIMIZACIÓN: Usar buscarConRelaciones para evitar N+1
+        //OPTIMIZACIÓN: Usar buscarConRelaciones para evitar N+1
         List<PlatoMenuDia> platosDelDia = platoMenuDiaRepository.buscarConRelaciones(hoy);
         List<PresaDia> presasDelDia = presaDiaRepository.findByFecha(hoy);
 
@@ -111,12 +111,7 @@ public class MenuDiaService {
                 .collect(Collectors.toList());
 
         List<PresaResponseDTO> presasDTO = presasDelDia.stream()
-                .map(pd -> PresaResponseDTO.builder()
-                        .id(pd.getPresa().getId())
-                        .nombre(pd.getPresa().getNombre())
-                        .precioAdicional(pd.getPresa().getPrecioAdicional())
-                        .stock(pd.getStock())
-                        .build())
+                .map(presaMapper::toResponseDTO)
                 .collect(Collectors.toList());
 
         return MenuDiaConfiguradoResponseDTO.builder()

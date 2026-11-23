@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "configuracion")
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Configuracion {
@@ -18,9 +20,15 @@ public class Configuracion {
     @Column(name = "precio_menu", nullable = false)
     private Double precioMenu;
 
+    @Builder.Default
+    @Column(name = "precio_menu_sin_entrada")
+    private Double precioMenuSinEntrada = 0.00;
+
+    @Builder.Default
     @Column(name = "costo_descartable")
     private Double costoDescartable = 2.00;
 
+    @Builder.Default
     @Column(name = "costo_delivery")
     private Double costoDelivery = 2.00;
 

@@ -11,5 +11,6 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByFechaHoraBetween(LocalDateTime inicio, LocalDateTime fin);
     long countByClienteId(Long clienteId);
+    long countByTipoComprobante(String tipoComprobante);
     List<Pedido> findByFechaHoraBetweenOrderByFechaHoraDesc(LocalDateTime inicio, LocalDateTime fin);
 }

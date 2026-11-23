@@ -15,6 +15,11 @@ public class PedidoResponseDTO {
     private Long id;
     private String clienteNombre;
     private String clienteTelefono;
+    private String clienteDocumento;
+    private String clienteDireccion;
+    private String tipoComprobante;
+    private String serieCorrelativo;
+    private String conceptoComprobante;
     private String tipo;
     private String tipoVenta;
     private String estado;

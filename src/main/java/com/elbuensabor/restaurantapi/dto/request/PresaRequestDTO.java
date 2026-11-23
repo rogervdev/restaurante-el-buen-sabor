@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PresaRequestDTO {
+
+    @NotBlank(message = "El nombre de la presa es obligatorio")
     private String nombre;
+
     private Double precioAdicional;
 }

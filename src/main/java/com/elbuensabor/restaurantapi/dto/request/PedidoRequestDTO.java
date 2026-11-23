@@ -14,10 +14,23 @@ public class PedidoRequestDTO {
 
     private Long clienteId;
 
-    @NotBlank(message = "El nombre del cliente es obligatorio")
     private String clienteNombre;
 
     private String clienteTelefono;
+
+    private String clienteNotas;
+
+    @Builder.Default
+    private String tipoComprobante = "BOLETA";
+
+    private String serieCorrelativo;
+
+    @Builder.Default
+    private String conceptoComprobante = "DETALLADO";
+
+    private String clienteDocumento;
+
+    private String clienteDireccion;
 
     @NotBlank(message = "El tipo de pedido es obligatorio")
     private String tipo; // MESA, LLEVAR
@@ -34,5 +47,6 @@ public class PedidoRequestDTO {
     private Double montoRecibido;
 
     // ✅ NUEVO: ¿Requiere delivery a domicilio?
+    @Builder.Default
     private Boolean requiereDelivery = false;
 }

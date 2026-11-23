@@ -5,7 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(name = "catalogo_plato_carta")
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CatalogoPlatoCarta {
@@ -17,19 +19,13 @@ public class CatalogoPlatoCarta {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Categoria categoria;
-
     @Column(nullable = false)
     private Double precio;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer stock = 0;
 
+    @Builder.Default
     private Boolean activo = true;
-
-    public enum Categoria {
-        SOPA, ENTRADA, PLATO_FONDO, BEBIDA, POSTRE
-    }
 }

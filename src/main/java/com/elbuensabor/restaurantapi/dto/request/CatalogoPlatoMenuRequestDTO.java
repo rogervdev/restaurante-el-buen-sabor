@@ -20,6 +20,7 @@ public class CatalogoPlatoMenuRequestDTO {
     @NotBlank(message = "El tipo de menú es obligatorio")
     private String tipoMenu; // ENTRADA, SEGUNDO, BEBIDA
 
+    @Builder.Default
     private Boolean permiteCambioPresa = false;
 
     private List<Long> presaIds; // IDs de las presas asociadas (si permiteCambioPresa = true)

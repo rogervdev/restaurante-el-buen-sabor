@@ -8,7 +8,9 @@ import java.time.LocalDate;
 @Table(name = "presa_dia", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"presa_id", "fecha"})
 })
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PresaDia {
@@ -24,6 +26,7 @@ public class PresaDia {
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer stock = 0;
 }

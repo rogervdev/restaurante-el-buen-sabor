@@ -8,7 +8,9 @@ import java.time.LocalDate;
 @Table(name = "plato_menu_dia", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"catalogo_plato_menu_id", "fecha"})
 })
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlatoMenuDia {
@@ -24,8 +26,10 @@ public class PlatoMenuDia {
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer stock = 0;
 
+    @Builder.Default
     private Boolean disponible = true;
 }

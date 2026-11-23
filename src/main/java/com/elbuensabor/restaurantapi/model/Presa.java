@@ -5,7 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(name = "presa")
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Presa {
@@ -17,8 +19,10 @@ public class Presa {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Builder.Default
     @Column(name = "precio_adicional")
     private Double precioAdicional = 0.00;
 
+    @Builder.Default
     private Boolean activo = true;
 }
